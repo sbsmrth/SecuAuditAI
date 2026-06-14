@@ -17,7 +17,7 @@ app = FastAPI(title="Motor de Auditoría RAG con Gemini")
 
 DIRECTORIO_DB = "./chroma_db"
 
-embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-004")
+embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-2-preview")
 
 def indexar_documentos():
     if not os.path.exists(DIRECTORIO_DB):
@@ -28,8 +28,12 @@ def indexar_documentos():
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
         fragmentos = text_splitter.split_documents(documentos_crudos)
         
-        Chroma.from_documents(documents=fragmentos, embedding=embeddings, persist_directory=DIRECTORIO_DB)
-        print("Base de datos creada exitosamente.")
+        db = Chroma.from_documents(
+            documents=fragmentos,
+            embedding=embeddings,
+            persist_directory=DIRECTORIO_DB
+        )
+
 
 indexar_documentos()
 vector_store = Chroma(persist_directory=DIRECTORIO_DB, embedding_function=embeddings)
